@@ -30,6 +30,8 @@ export const formatMonthYear = (monthYearStr) => {
   if (parts.length !== 2) return monthYearStr;
   const year = parseInt(parts[0], 10);
   const month = parseInt(parts[1], 10) - 1;
+  if (isNaN(year) || isNaN(month)) return monthYearStr;
   const date = new Date(year, month, 1);
+  if (isNaN(date.getTime())) return monthYearStr;
   return new Intl.DateTimeFormat('en-IN', { month: 'short', year: 'numeric' }).format(date);
 };

@@ -223,7 +223,7 @@ export default function Budget() {
       <ConfirmDialog
         isOpen={!!deletingBudget}
         title="Delete Target Budget"
-        message={`Are you sure you want to remove the target budget for ${formatMonthYear(`${deletingBudget?.year}-${String(deletingBudget?.month).padStart(2, '0')}`)}?`}
+        message={deletingBudget ? `Are you sure you want to remove the target budget for ${formatMonthYear(`${deletingBudget.year}-${String(deletingBudget.month).padStart(2, '0')}`)}?` : ''}
         onConfirm={handleDelete}
         onCancel={() => setDeletingBudget(null)}
         loading={submitting}
