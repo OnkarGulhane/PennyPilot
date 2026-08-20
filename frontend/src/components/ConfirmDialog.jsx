@@ -1,32 +1,40 @@
 import React from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 
-export const ConfirmDialog = ({ isOpen, title, message, onConfirm, onCancel, loading }) => {
+export const ConfirmDialog = ({
+  isOpen,
+  title,
+  message,
+  onConfirm,
+  onCancel,
+  loading,
+  confirmText = 'Delete Entry',
+}) => {
   if (!isOpen) return null;
 
   return (
-    <div style={styles.overlay}>
-      <div className="glass-card" style={styles.modal}>
+    <div style={styles.overlay} className="animate-backdrop">
+      <div className="glass-panel modal-responsive animate-modal-pop" style={styles.modal}>
         <div style={styles.header}>
-          <div style={styles.iconContainer}>
-            <AlertTriangle size={24} color="var(--danger)" />
+          <div style={styles.iconBadge}>
+            <AlertTriangle size={22} color="var(--danger)" />
           </div>
-          <button onClick={onCancel} style={styles.closeBtn}>
-            <X size={20} />
+          <h3 style={styles.title}>{title}</h3>
+          <button onClick={onCancel} style={styles.closeBtn} title="Cancel">
+            <X size={18} />
           </button>
         </div>
 
-        <div style={styles.content}>
-          <h3 style={styles.title}>{title || 'Are you sure?'}</h3>
-          <p style={styles.message}>{message || 'This action cannot be undone.'}</p>
+        <div style={styles.body}>
+          <p style={styles.message}>{message}</p>
         </div>
 
         <div style={styles.actions}>
-          <button onClick={onCancel} className="btn btn-secondary">
+          <button onClick={onCancel} className="btn btn-secondary btn-sm" disabled={loading}>
             Cancel
           </button>
-          <button onClick={onConfirm} disabled={loading} className="btn btn-danger">
-            {loading ? 'Deleting...' : 'Delete'}
+          <button onClick={onConfirm} className="btn btn-danger btn-sm" disabled={loading}>
+            {loading ? 'Processing...' : confirmText}
           </button>
         </div>
       </div>
@@ -41,51 +49,54 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    backdropFilter: 'blur(4px)',
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backdropFilter: 'blur(8px)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    zIndex: 110,
-    padding: '20px',
+    zIndex: 150,
+    padding: '16px',
   },
   modal: {
     width: '100%',
     maxWidth: '420px',
     padding: '24px',
+    borderRadius: '20px',
   },
   header: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: '16px',
+    gap: '12px',
+    marginBottom: '14px',
   },
-  iconContainer: {
-    width: '44px',
-    height: '44px',
+  iconBadge: {
+    width: '40px',
+    height: '40px',
     borderRadius: '12px',
     backgroundColor: 'var(--danger-bg)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  closeBtn: {
-    background: 'transparent',
-    border: 'none',
-    color: 'var(--text-secondary)',
-    cursor: 'pointer',
-  },
-  content: {
-    marginBottom: '24px',
-  },
   title: {
     fontSize: '1.15rem',
     color: 'var(--text-primary)',
-    marginBottom: '6px',
+    fontWeight: '800',
+    flex: 1,
+  },
+  closeBtn: {
+    background: 'transparent',
+    border: 'none',
+    color: 'var(--text-muted)',
+    cursor: 'pointer',
+  },
+  body: {
+    marginBottom: '20px',
   },
   message: {
     fontSize: '0.9rem',
     color: 'var(--text-secondary)',
+    lineHeight: '1.5',
   },
   actions: {
     display: 'flex',

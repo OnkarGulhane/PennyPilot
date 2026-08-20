@@ -28,7 +28,7 @@ export const Navbar = () => {
       </div>
 
       <div style={styles.statusPill}>
-        <span style={styles.statusDot} />
+        <span style={styles.statusDot} className="animate-pulse-glow" />
         <span>PostgreSQL API Live</span>
       </div>
 

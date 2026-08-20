@@ -44,6 +44,7 @@
   --shadow-emerald-glow: 0 0 30px rgba(16, 185, 129, 0.3);
 
   --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-spring: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 [data-theme="light"] {
@@ -102,6 +103,7 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   transition: var(--transition);
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .glass-panel:hover {
@@ -117,7 +119,85 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: var(--shadow-lg);
 }
 
-/* Buttons */
+/* ==========================================================================
+   Staff-Designer Animation Keyframes
+   ========================================================================== */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes backdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Animation Utility Classes */
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-modal-pop {
+  animation: modalPopIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-backdrop {
+  animation: backdropFadeIn 0.25s ease-out forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s infinite;
+}
+
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+
+/* Buttons & Micro-Interactions */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -134,7 +214,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
 .btn-primary {
@@ -220,6 +300,11 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 9999px;
   letter-spacing: 0.03em;
   white-space: nowrap;
+  transition: var(--transition);
+}
+
+.dot-badge:hover {
+  transform: scale(1.05);
 }
 
 .dot-badge::before {
@@ -253,12 +338,20 @@ h1, h2, h3, h4, h5, h6 {
 .progress-bar {
   height: 100%;
   border-radius: 9999px;
-  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .progress-success { background: linear-gradient(90deg, #10b981, #34d399); }
 .progress-warning { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
 .progress-danger { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+/* Table Row Hover Animations */
+.hover-row {
+  transition: var(--transition);
+}
+.hover-row:hover {
+  background-color: rgba(99, 102, 241, 0.05);
+}
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {

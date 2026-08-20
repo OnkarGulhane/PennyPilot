@@ -90,8 +90,8 @@ export const ExpenseForm = ({ initialData, isOpen, onClose, onSubmit, loading })
   const selectedCategoryObj = CATEGORY_ITEMS.find((c) => c.id === formData.category) || CATEGORY_ITEMS[0];
 
   return (
-    <div style={styles.overlay}>
-      <div className="glass-panel modal-responsive" style={styles.modal}>
+    <div style={styles.overlay} className="animate-backdrop">
+      <div className="glass-panel modal-responsive animate-modal-pop" style={styles.modal}>
         {/* Header */}
         <div style={styles.header}>
           <div style={styles.headerTitleGroup}>
