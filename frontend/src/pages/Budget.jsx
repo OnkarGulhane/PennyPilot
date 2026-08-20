@@ -29,8 +29,11 @@ export default function Budget() {
     setLoading(true);
     setError('');
     try {
-      const response = await budgetApi.getBudgets();
-      setBudgets(response || []);
+      const response = await budgetApi.getBudgets().catch(() => []);
+      const budgetList = Array.isArray(response)
+        ? response
+        : (response && typeof response === 'object' && response.month ? [response] : []);
+      setBudgets(budgetList);
     } catch (err) {
       setError(err.message || 'Failed to load budgets');
     } finally {

@@ -46,7 +46,7 @@ export default function Dashboard() {
         dashboardApi.getCategorySummary(),
         dashboardApi.getMonthlySummary(),
         expenseApi.getExpenses({ page: 0, size: 5, sort: 'expenseDate,desc' }),
-        budgetApi.getBudgets(),
+        budgetApi.getBudgets().catch(() => []),
       ]);
 
       setSummary(sumRes);
@@ -62,7 +62,12 @@ export default function Dashboard() {
       const currentMonth = now.getMonth() + 1;
       const currentYear = now.getFullYear();
       
-      let foundBudget = (budgetRes || []).find(
+      // Ensure budgetList is safely array
+      const budgetList = Array.isArray(budgetRes)
+        ? budgetRes
+        : (budgetRes && typeof budgetRes === 'object' && budgetRes.month ? [budgetRes] : []);
+
+      let foundBudget = budgetList.find(
         (b) => Number(b.month) === currentMonth && Number(b.year) === currentYear
       );
 
