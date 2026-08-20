@@ -7,7 +7,7 @@ import { BudgetCard } from '../components/BudgetCard';
 import { ExpenseTable } from '../components/ExpenseTable';
 import { Loading } from '../components/Loading';
 import { ErrorMessage } from '../components/ErrorMessage';
-import { DollarSign, Calendar, TrendingUp, Award, Plus, Sparkles, Activity, PieChart as PieIcon, BarChart3 } from 'lucide-react';
+import { DollarSign, Calendar, TrendingUp, Award, Plus, Sparkles, Activity, PieChart as PieIcon, BarChart3, Wallet } from 'lucide-react';
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
   BarChart, Bar, XAxis, YAxis, CartesianGrid
@@ -30,8 +30,12 @@ export default function Dashboard() {
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
+  const [isSetBudgetOpen, setIsSetBudgetOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  const now = new Date();
+  const [budgetInput, setBudgetInput] = useState('');
 
   const fetchDashboardData = async () => {
     setLoading(true);
@@ -55,11 +59,24 @@ export default function Dashboard() {
       );
       setRecentExpenses(expRes?.content || []);
       
-      const now = new Date();
-      const currentMonthBudget = (budgetRes || []).find(
-        (b) => b.month === now.getMonth() + 1 && b.year === now.getFullYear()
+      const currentMonth = now.getMonth() + 1;
+      const currentYear = now.getFullYear();
+      
+      let foundBudget = (budgetRes || []).find(
+        (b) => Number(b.month) === currentMonth && Number(b.year) === currentYear
       );
-      setCurrentBudget(currentMonthBudget || null);
+
+      if (!foundBudget && sumRes?.monthlyBudget > 0) {
+        foundBudget = {
+          amount: sumRes.monthlyBudget,
+          totalSpent: sumRes.currentMonthExpense,
+          remainingAmount: sumRes.remainingBudget,
+          usagePercentage: sumRes.budgetUsagePercentage,
+          budgetExceeded: sumRes.budgetExceeded,
+        };
+      }
+
+      setCurrentBudget(foundBudget || null);
     } catch (err) {
       setError(err.message || 'Failed to load dashboard analytics');
     } finally {
@@ -75,10 +92,35 @@ export default function Dashboard() {
     setSubmitting(true);
     try {
       await expenseApi.createExpense(formData);
-      setIsAddOpen(false);
+      setIsAddExpenseOpen(false);
       fetchDashboardData();
     } catch (err) {
       alert(err.message || 'Failed to record expense');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleSaveBudget = async (e) => {
+    e.preventDefault();
+    const amountNum = parseFloat(budgetInput);
+    if (isNaN(amountNum) || amountNum <= 0) {
+      alert('Please enter a valid budget amount greater than ₹0');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await budgetApi.createBudget({
+        month: now.getMonth() + 1,
+        year: now.getFullYear(),
+        amount: amountNum,
+      });
+      setIsSetBudgetOpen(false);
+      setBudgetInput('');
+      fetchDashboardData();
+    } catch (err) {
+      alert(err.message || 'Failed to save budget target');
     } finally {
       setSubmitting(false);
     }
@@ -102,7 +144,7 @@ export default function Dashboard() {
         </div>
 
         <div style={styles.heroActions}>
-          <button onClick={() => setIsAddOpen(true)} className="btn btn-primary">
+          <button onClick={() => setIsAddExpenseOpen(true)} className="btn btn-primary">
             <Plus size={18} />
             <span>Quick Record Expense</span>
           </button>
@@ -149,7 +191,10 @@ export default function Dashboard() {
 
       {/* Budget & Category Breakdown Grid */}
       <div style={styles.chartsGrid} className="grid-responsive-2col">
-        <BudgetCard budget={currentBudget} />
+        <BudgetCard
+          budget={currentBudget}
+          onSetBudget={() => setIsSetBudgetOpen(true)}
+        />
 
         {/* Category Pie Chart */}
         <div className="glass-panel" style={styles.chartCard}>
@@ -241,11 +286,51 @@ export default function Dashboard() {
 
       {/* Add Expense Modal */}
       <ExpenseForm
-        isOpen={isAddOpen}
-        onClose={() => setIsAddOpen(false)}
+        isOpen={isAddExpenseOpen}
+        onClose={() => setIsAddExpenseOpen(false)}
         onSubmit={handleCreateExpense}
         loading={submitting}
       />
+
+      {/* Quick Set Budget Modal */}
+      {isSetBudgetOpen && (
+        <div style={styles.overlay}>
+          <div className="glass-panel" style={styles.budgetModal}>
+            <div style={styles.modalHeader}>
+              <div style={styles.modalIcon}>
+                <Wallet size={24} color="var(--primary)" />
+              </div>
+              <h3 style={{ fontSize: '1.25rem', color: 'var(--text-primary)' }}>Set Current Month Budget</h3>
+            </div>
+
+            <form onSubmit={handleSaveBudget}>
+              <div className="form-group" style={{ margin: '20px 0' }}>
+                <label className="form-label">Monthly Target Amount (₹) *</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  value={budgetInput}
+                  onChange={(e) => setBudgetInput(e.target.value)}
+                  placeholder="e.g. 20000.00"
+                  className="form-control-pro"
+                  autoFocus
+                  required
+                />
+              </div>
+
+              <div style={styles.modalActions}>
+                <button type="button" onClick={() => setIsSetBudgetOpen(false)} className="btn btn-secondary">
+                  Cancel
+                </button>
+                <button type="submit" disabled={submitting} className="btn btn-primary">
+                  {submitting ? 'Saving...' : 'Save Target Budget'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -340,5 +425,44 @@ const styles = {
     borderRadius: '10px',
     color: '#ffffff',
     boxShadow: 'var(--shadow-md)',
+  },
+  overlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backdropFilter: 'blur(6px)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 120,
+    padding: '16px',
+  },
+  budgetModal: {
+    width: '100%',
+    maxWidth: '440px',
+    padding: '28px',
+    borderRadius: '20px',
+  },
+  modalHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+  },
+  modalIcon: {
+    width: '42px',
+    height: '42px',
+    borderRadius: '12px',
+    backgroundColor: 'var(--primary-light)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalActions: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: '12px',
   },
 };

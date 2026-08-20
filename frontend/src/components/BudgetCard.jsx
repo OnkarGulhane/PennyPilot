@@ -1,33 +1,53 @@
 import React from 'react';
 import { formatCurrency } from '../utils/currency';
-import { AlertTriangle, CheckCircle2, Flame, Target } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Flame, Target, Plus, CalendarDays } from 'lucide-react';
 
-export const BudgetCard = ({ budget }) => {
-  if (!budget) {
+export const BudgetCard = ({ budget, onSetBudget }) => {
+  if (!budget || !budget.amount || Number(budget.amount) <= 0) {
     return (
       <div className="glass-panel" style={styles.emptyCard}>
-        <Target size={36} color="var(--primary)" />
-        <h3 style={{ marginTop: '12px', fontSize: '1.1rem' }}>No Monthly Budget Set</h3>
-        <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-          Configure a monthly target budget limit to track your spending limits in real-time.
-        </p>
+        <div style={styles.emptyHeader}>
+          <div style={styles.emptyIconBadge}>
+            <Target size={24} color="var(--primary)" />
+          </div>
+          <div>
+            <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)', fontWeight: '800' }}>
+              No Monthly Budget Configured
+            </h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+              Set a monthly spending limit to monitor remaining balance and budget alerts.
+            </p>
+          </div>
+        </div>
+        {onSetBudget && (
+          <button onClick={onSetBudget} className="btn btn-primary btn-sm" style={{ marginTop: '14px' }}>
+            <Plus size={16} />
+            <span>Set Current Month Budget</span>
+          </button>
+        )}
       </div>
     );
   }
 
   const { amount, totalSpent, remainingAmount, usagePercentage, budgetExceeded } = budget;
 
+  // Calculate days remaining in current month for daily safe allowance
+  const now = new Date();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const daysRemaining = Math.max(1, daysInMonth - now.getDate() + 1);
+  const safeDailyAllowance = Math.max(0, (Number(remainingAmount) || 0) / daysRemaining);
+
   let progressClass = 'progress-success';
   let badgeStyle = { background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)' };
   let statusText = 'Within Budget Goal';
   let StatusIcon = CheckCircle2;
 
-  if (budgetExceeded) {
+  if (budgetExceeded || Number(remainingAmount) < 0) {
     progressClass = 'progress-danger';
     badgeStyle = { background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)' };
     statusText = 'Budget Exceeded!';
     StatusIcon = Flame;
-  } else if (usagePercentage >= 80) {
+  } else if (Number(usagePercentage) >= 80) {
     progressClass = 'progress-warning';
     badgeStyle = { background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.3)' };
     statusText = 'Near Limit (80%+)';
@@ -47,16 +67,25 @@ export const BudgetCard = ({ budget }) => {
         </span>
       </div>
 
+      {/* Progress Bar & Labels */}
       <div style={styles.progressSection}>
         <div style={styles.progressLabels}>
           <span>Spent: <strong className="tabular-nums">{formatCurrency(totalSpent)}</strong> ({usagePercentage}%)</span>
-          <span>Remaining: <strong className="tabular-nums">{formatCurrency(remainingAmount)}</strong></span>
+          <span>Remaining: <strong className="tabular-nums" style={{ color: Number(remainingAmount) < 0 ? 'var(--danger)' : 'var(--emerald)' }}>{formatCurrency(remainingAmount)}</strong></span>
         </div>
         <div className="progress-container" style={{ height: '12px' }}>
           <div
             className={`progress-bar ${progressClass}`}
-            style={{ width: `${Math.min(usagePercentage, 100)}%` }}
+            style={{ width: `${Math.min(Number(usagePercentage) || 0, 100)}%` }}
           />
+        </div>
+      </div>
+
+      {/* Daily Safe Spend Footer */}
+      <div style={styles.footerRow}>
+        <div style={styles.footerItem}>
+          <CalendarDays size={14} color="var(--secondary)" />
+          <span>Safe Daily Spending Allowance: <strong className="tabular-nums" style={{ color: 'var(--text-primary)' }}>{formatCurrency(safeDailyAllowance)} / day</strong> ({daysRemaining} days left)</span>
         </div>
       </div>
     </div>
@@ -68,7 +97,7 @@ const styles = {
     padding: '24px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '22px',
+    gap: '20px',
   },
   header: {
     display: 'flex',
@@ -77,12 +106,12 @@ const styles = {
   },
   subtitle: {
     fontSize: '0.75rem',
-    fontWeight: '700',
-    color: 'var(--text-secondary)',
+    fontWeight: '800',
+    color: 'var(--text-muted)',
     letterSpacing: '0.06em',
   },
   amount: {
-    fontSize: '1.85rem',
+    fontSize: '1.9rem',
     color: 'var(--text-primary)',
     fontFamily: 'var(--font-display)',
     fontWeight: '800',
@@ -108,11 +137,38 @@ const styles = {
     fontSize: '0.875rem',
     color: 'var(--text-secondary)',
   },
+  footerRow: {
+    paddingTop: '12px',
+    borderTop: '1px solid var(--border-color)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  footerItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    fontSize: '0.8rem',
+    color: 'var(--text-secondary)',
+  },
   emptyCard: {
-    padding: '36px',
-    textAlign: 'center',
+    padding: '32px',
     display: 'flex',
     flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+  },
+  emptyHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px',
+  },
+  emptyIconBadge: {
+    width: '48px',
+    height: '48px',
+    borderRadius: '14px',
+    backgroundColor: 'var(--primary-light)',
+    display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
   },
