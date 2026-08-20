@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { DollarSign, Lock, Mail, Eye, EyeOff } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, Sparkles, ShieldCheck, Zap } from 'lucide-react';
 import { ErrorMessage } from '../components/ErrorMessage';
 
 export default function Login() {
@@ -33,13 +33,13 @@ export default function Login() {
 
   return (
     <div style={styles.container}>
-      <div className="glass-card" style={styles.card}>
+      <div className="glass-panel" style={styles.card}>
         <div style={styles.header}>
           <div style={styles.logoBadge}>
-            <DollarSign size={28} color="#ffffff" />
+            <Sparkles size={28} color="#ffffff" />
           </div>
-          <h2 style={styles.title}>Welcome Back</h2>
-          <p style={styles.subtitle}>Sign in to your SmartExpense account</p>
+          <h2 style={styles.title}>SmartExpense PRO</h2>
+          <p style={styles.subtitle}>Sign in to your financial intelligence workspace</p>
         </div>
 
         <ErrorMessage message={error} />
@@ -55,7 +55,7 @@ export default function Login() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="name@example.com"
-                className="form-control"
+                className="form-control-pro"
                 style={{ paddingLeft: '42px' }}
                 required
               />
@@ -72,7 +72,7 @@ export default function Login() {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Enter password"
-                className="form-control"
+                className="form-control-pro"
                 style={{ paddingLeft: '42px', paddingRight: '42px' }}
                 required
               />
@@ -92,9 +92,20 @@ export default function Login() {
             className="btn btn-primary"
             style={{ width: '100%', marginTop: '12px', padding: '14px' }}
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Authenticating...' : 'Sign In to Workspace'}
           </button>
         </form>
+
+        <div style={styles.featurePills}>
+          <div style={styles.featurePill}>
+            <ShieldCheck size={14} color="var(--emerald)" />
+            <span>JWT Security</span>
+          </div>
+          <div style={styles.featurePill}>
+            <Zap size={14} color="var(--secondary)" />
+            <span>Real-time Analytics</span>
+          </div>
+        </div>
 
         <div style={styles.footer}>
           <span>Don't have an account? </span>
@@ -114,12 +125,12 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     padding: '20px',
-    background: 'radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 40%), radial-gradient(circle at bottom left, rgba(6, 182, 212, 0.15), transparent 40%), var(--bg-primary)',
+    background: 'radial-gradient(circle at top right, rgba(99, 102, 241, 0.25), transparent 50%), radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.15), transparent 50%), var(--bg-primary)',
   },
   card: {
     width: '100%',
     maxWidth: '440px',
-    padding: '36px',
+    padding: '38px',
   },
   header: {
     display: 'flex',
@@ -129,9 +140,9 @@ const styles = {
     marginBottom: '28px',
   },
   logoBadge: {
-    width: '56px',
-    height: '56px',
-    borderRadius: '16px',
+    width: '60px',
+    height: '60px',
+    borderRadius: '18px',
     background: 'linear-gradient(135deg, #6366f1, #06b6d4)',
     display: 'flex',
     alignItems: 'center',
@@ -140,11 +151,11 @@ const styles = {
     boxShadow: 'var(--shadow-glow)',
   },
   title: {
-    fontSize: '1.75rem',
+    fontSize: '1.85rem',
     color: 'var(--text-primary)',
   },
   subtitle: {
-    fontSize: '0.9rem',
+    fontSize: '0.875rem',
     color: 'var(--text-muted)',
     marginTop: '4px',
   },
@@ -170,13 +181,31 @@ const styles = {
     color: 'var(--text-muted)',
     cursor: 'pointer',
   },
-  footer: {
+  featurePills: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '12px',
     marginTop: '24px',
+    paddingTop: '20px',
+    borderTop: '1px solid var(--border-color)',
+  },
+  featurePill: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    fontSize: '0.75rem',
+    fontWeight: '700',
+    color: 'var(--text-secondary)',
+  },
+  footer: {
+    marginTop: '20px',
     textAlign: 'center',
-    fontSize: '0.9rem',
+    fontSize: '0.875rem',
     color: 'var(--text-secondary)',
   },
   link: {
-    fontWeight: '600',
+    fontWeight: '700',
+    color: 'var(--primary)',
   },
 };

@@ -4,7 +4,7 @@ import { BudgetCard } from '../components/BudgetCard';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { Loading } from '../components/Loading';
 import { ErrorMessage } from '../components/ErrorMessage';
-import { Plus, Wallet, Trash2, Edit2 } from 'lucide-react';
+import { Plus, Wallet, Trash2, Edit3, Target } from 'lucide-react';
 import { formatCurrency } from '../utils/currency';
 import { formatMonthYear } from '../utils/date';
 
@@ -101,18 +101,22 @@ export default function Budget() {
     }
   };
 
-  if (loading) return <Loading text="Loading Monthly Budgets..." />;
+  if (loading) return <Loading text="Loading Budget Planning Module..." />;
 
   return (
     <div style={styles.container}>
       <div style={styles.pageHeader}>
         <div>
-          <h1 style={styles.pageTitle}>Monthly Budgets</h1>
-          <p style={styles.pageSubtitle}>Set monthly spending limits and monitor budget utilization</p>
+          <div style={styles.headerBadge}>
+            <Wallet size={16} color="var(--emerald)" />
+            <span>BUDGET PLANNING & GOALS</span>
+          </div>
+          <h1 style={styles.pageTitle}>Monthly Target Budgets</h1>
+          <p style={styles.pageSubtitle}>Define target spending caps and monitor utilization limits</p>
         </div>
         <button onClick={handleOpenCreate} className="btn btn-primary">
           <Plus size={18} />
-          <span>Set Budget</span>
+          <span>Set Target Budget</span>
         </button>
       </div>
 
@@ -125,11 +129,11 @@ export default function Budget() {
             <BudgetCard budget={b} />
             <div style={styles.cardActions}>
               <button onClick={() => handleOpenEdit(b)} style={styles.actionBtn}>
-                <Edit2 size={16} color="var(--primary)" />
-                <span>Edit Target</span>
+                <Edit3 size={15} color="var(--primary)" />
+                <span>Modify Target</span>
               </button>
               <button onClick={() => setDeletingBudget(b)} style={{ ...styles.actionBtn, color: 'var(--danger)' }}>
-                <Trash2 size={16} />
+                <Trash2 size={15} />
                 <span>Delete</span>
               </button>
             </div>
@@ -137,32 +141,32 @@ export default function Budget() {
         ))}
 
         {budgets.length === 0 && (
-          <div className="glass-card" style={styles.emptyCard}>
-            <Wallet size={48} color="var(--text-muted)" style={{ marginBottom: '16px' }} />
-            <h3>No Monthly Budgets Configured</h3>
+          <div className="glass-panel" style={styles.emptyCard}>
+            <Target size={48} color="var(--primary)" style={{ marginBottom: '16px' }} />
+            <h3>No Active Budget Targets</h3>
             <p style={{ marginTop: '6px', color: 'var(--text-muted)' }}>
-              Click "Set Budget" to define a target spending limit for any month.
+              Click "Set Target Budget" above to create a monthly spending cap limit.
             </p>
           </div>
         )}
       </div>
 
-      {/* Create / Edit Modal */}
+      {/* Modal */}
       {isModalOpen && (
         <div style={styles.overlay}>
-          <div className="glass-card" style={styles.modal}>
-            <h3 style={{ marginBottom: '20px' }}>
-              {editingBudget ? 'Edit Monthly Budget' : 'Set New Monthly Budget'}
+          <div className="glass-panel" style={styles.modal}>
+            <h3 style={{ marginBottom: '20px', fontSize: '1.25rem' }}>
+              {editingBudget ? 'Edit Target Budget' : 'Configure Monthly Budget'}
             </h3>
 
             <form onSubmit={handleSubmit}>
               <div style={styles.row}>
                 <div className="form-group" style={{ flex: 1 }}>
-                  <label className="form-label">Month (1-12)</label>
+                  <label className="form-label">Month</label>
                   <select
                     value={formData.month}
                     onChange={(e) => setFormData({ ...formData, month: e.target.value })}
-                    className="form-control"
+                    className="form-control-pro"
                     required
                   >
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((m) => (
@@ -179,14 +183,14 @@ export default function Budget() {
                     type="number"
                     value={formData.year}
                     onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                    className="form-control"
+                    className="form-control-pro"
                     required
                   />
                 </div>
               </div>
 
               <div className="form-group">
-                <label className="form-label">Budget Limit Amount (₹) *</label>
+                <label className="form-label">Target Limit Amount (₹) *</label>
                 <input
                   type="number"
                   step="0.01"
@@ -194,7 +198,7 @@ export default function Budget() {
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                   placeholder="e.g. 20000.00"
-                  className="form-control"
+                  className="form-control-pro"
                   required
                 />
               </div>
@@ -204,7 +208,7 @@ export default function Budget() {
                   Cancel
                 </button>
                 <button type="submit" disabled={submitting} className="btn btn-primary">
-                  {submitting ? 'Saving...' : editingBudget ? 'Update Budget' : 'Save Budget'}
+                  {submitting ? 'Saving...' : editingBudget ? 'Update Target' : 'Save Target'}
                 </button>
               </div>
             </form>
@@ -215,8 +219,8 @@ export default function Budget() {
       {/* Delete Confirmation Modal */}
       <ConfirmDialog
         isOpen={!!deletingBudget}
-        title="Delete Monthly Budget"
-        message={`Are you sure you want to delete the budget limit for ${formatMonthYear(`${deletingBudget?.year}-${String(deletingBudget?.month).padStart(2, '0')}`)}?`}
+        title="Delete Target Budget"
+        message={`Are you sure you want to remove the target budget for ${formatMonthYear(`${deletingBudget?.year}-${String(deletingBudget?.month).padStart(2, '0')}`)}?`}
         onConfirm={handleDelete}
         onCancel={() => setDeletingBudget(null)}
         loading={submitting}
@@ -236,8 +240,18 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  headerBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    fontSize: '0.75rem',
+    fontWeight: '800',
+    color: 'var(--emerald)',
+    letterSpacing: '0.08em',
+    marginBottom: '4px',
+  },
   pageTitle: {
-    fontSize: '1.75rem',
+    fontSize: '1.85rem',
     color: 'var(--text-primary)',
   },
   pageSubtitle: {
@@ -266,7 +280,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '6px',
-    fontSize: '0.85rem',
+    fontSize: '0.825rem',
     fontWeight: '600',
     color: 'var(--text-secondary)',
     cursor: 'pointer',
@@ -287,7 +301,7 @@ const styles = {
     right: 0,
     bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    backdropFilter: 'blur(4px)',
+    backdropFilter: 'blur(6px)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

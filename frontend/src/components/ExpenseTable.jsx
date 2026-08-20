@@ -1,7 +1,7 @@
 import React from 'react';
 import { formatCurrency } from '../utils/currency';
 import { formatDate } from '../utils/date';
-import { Edit2, Trash2, ArrowUpDown } from 'lucide-react';
+import { Edit3, Trash2, ArrowUpDown, CreditCard, Banknote, Landmark, Smartphone } from 'lucide-react';
 
 export const ExpenseTable = ({
   expenses,
@@ -28,10 +28,21 @@ export const ExpenseTable = ({
     }
   };
 
+  const getPaymentIcon = (method) => {
+    switch (method) {
+      case 'CASH': return <Banknote size={14} />;
+      case 'UPI': return <Smartphone size={14} />;
+      case 'CREDIT_CARD':
+      case 'DEBIT_CARD': return <CreditCard size={14} />;
+      case 'BANK_TRANSFER': return <Landmark size={14} />;
+      default: return null;
+    }
+  };
+
   if (!expenses || expenses.length === 0) {
     return (
       <div style={styles.emptyState}>
-        <p>No expenses found. Click "Add Expense" to record your first transaction.</p>
+        <p>No expense transactions found matching your criteria.</p>
       </div>
     );
   }
@@ -43,36 +54,41 @@ export const ExpenseTable = ({
           <tr>
             <th style={styles.th} onClick={() => onSortChange && onSortChange('expenseDate')}>
               <div style={styles.thContent}>
-                <span>Date</span>
-                <ArrowUpDown size={14} />
+                <span>DATE</span>
+                <ArrowUpDown size={13} color="var(--primary)" />
               </div>
             </th>
-            <th style={styles.th}>Category</th>
-            <th style={styles.th}>Description</th>
-            <th style={styles.th}>Payment Method</th>
+            <th style={styles.th}>CATEGORY</th>
+            <th style={styles.th}>DESCRIPTION</th>
+            <th style={styles.th}>PAYMENT METHOD</th>
             <th style={styles.th} onClick={() => onSortChange && onSortChange('amount')}>
               <div style={styles.thContent}>
-                <span>Amount</span>
-                <ArrowUpDown size={14} />
+                <span>AMOUNT</span>
+                <ArrowUpDown size={13} color="var(--primary)" />
               </div>
             </th>
-            <th style={{ ...styles.th, textAlign: 'right' }}>Actions</th>
+            <th style={{ ...styles.th, textAlign: 'right' }}>ACTIONS</th>
           </tr>
         </thead>
         <tbody>
           {expenses.map((item) => (
-            <tr key={item.id} style={styles.tr}>
-              <td style={styles.td}>{formatDate(item.expenseDate)}</td>
+            <tr key={item.id} style={styles.tr} className="hover-row">
+              <td style={styles.td} className="tabular-nums">{formatDate(item.expenseDate)}</td>
               <td style={styles.td}>
-                <span className={`badge ${getCategoryBadgeClass(item.category)}`}>
+                <span className={`dot-badge ${getCategoryBadgeClass(item.category)}`}>
                   {item.category}
                 </span>
               </td>
-              <td style={styles.td}>{item.description || '—'}</td>
-              <td style={styles.td}>
-                <span style={styles.paymentBadge}>{item.paymentMethod.replace('_', ' ')}</span>
+              <td style={{ ...styles.td, color: 'var(--text-primary)', fontWeight: '500' }}>
+                {item.description || '—'}
               </td>
-              <td style={{ ...styles.td, fontWeight: '700', color: 'var(--text-primary)' }}>
+              <td style={styles.td}>
+                <div style={styles.paymentBadge}>
+                  {getPaymentIcon(item.paymentMethod)}
+                  <span>{item.paymentMethod.replace('_', ' ')}</span>
+                </div>
+              </td>
+              <td style={{ ...styles.td, fontWeight: '800', color: 'var(--text-primary)', fontSize: '0.95rem' }} className="tabular-nums">
                 {formatCurrency(item.amount)}
               </td>
               <td style={{ ...styles.td, textAlign: 'right' }}>
@@ -80,16 +96,16 @@ export const ExpenseTable = ({
                   <button
                     onClick={() => onEdit && onEdit(item)}
                     style={styles.iconBtn}
-                    title="Edit Expense"
+                    title="Edit Expense Entry"
                   >
-                    <Edit2 size={16} color="var(--primary)" />
+                    <Edit3 size={15} color="var(--primary)" />
                   </button>
                   <button
                     onClick={() => onDelete && onDelete(item)}
                     style={{ ...styles.iconBtn, color: 'var(--danger)' }}
-                    title="Delete Expense"
+                    title="Delete Expense Entry"
                   >
-                    <Trash2 size={16} />
+                    <Trash2 size={15} />
                   </button>
                 </div>
               </td>
@@ -98,10 +114,10 @@ export const ExpenseTable = ({
         </tbody>
       </table>
 
-      {/* Pagination Footer */}
+      {/* Pagination Controls */}
       <div style={styles.pagination}>
         <span style={styles.pageInfo}>
-          Showing page <strong>{page + 1}</strong> of <strong>{totalPages || 1}</strong> ({totalElements} total)
+          Page <strong className="tabular-nums">{page + 1}</strong> of <strong className="tabular-nums">{totalPages || 1}</strong> ({totalElements} total entries)
         </span>
         <div style={styles.pageBtns}>
           <button
@@ -135,12 +151,12 @@ const styles = {
     textAlign: 'left',
   },
   th: {
-    padding: '14px 16px',
-    fontSize: '0.8rem',
-    fontWeight: '700',
+    padding: '16px 20px',
+    fontSize: '0.75rem',
+    fontWeight: '800',
     textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-    color: 'var(--text-secondary)',
+    letterSpacing: '0.06em',
+    color: 'var(--text-muted)',
     borderBottom: '1px solid var(--border-color)',
     cursor: 'pointer',
     userSelect: 'none',
@@ -155,17 +171,21 @@ const styles = {
     transition: 'var(--transition)',
   },
   td: {
-    padding: '14px 16px',
+    padding: '16px 20px',
     fontSize: '0.9rem',
     color: 'var(--text-secondary)',
   },
   paymentBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
     fontSize: '0.78rem',
-    padding: '3px 8px',
-    borderRadius: '6px',
+    fontWeight: '600',
+    padding: '4px 10px',
+    borderRadius: '8px',
     backgroundColor: 'var(--bg-tertiary)',
     color: 'var(--text-secondary)',
-    fontWeight: '500',
+    border: '1px solid var(--border-color)',
   },
   actions: {
     display: 'flex',
@@ -174,22 +194,25 @@ const styles = {
     gap: '8px',
   },
   iconBtn: {
-    background: 'transparent',
-    border: 'none',
+    background: 'var(--bg-tertiary)',
+    border: '1px solid var(--border-color)',
     cursor: 'pointer',
-    padding: '6px',
-    borderRadius: '6px',
+    padding: '8px',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     transition: 'var(--transition)',
   },
   pagination: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '16px 20px',
+    padding: '16px 24px',
     borderTop: '1px solid var(--border-color)',
   },
   pageInfo: {
-    fontSize: '0.875rem',
+    fontSize: '0.85rem',
     color: 'var(--text-secondary)',
   },
   pageBtns: {
@@ -197,7 +220,7 @@ const styles = {
     gap: '8px',
   },
   emptyState: {
-    padding: '40px',
+    padding: '50px',
     textAlign: 'center',
     color: 'var(--text-muted)',
     fontSize: '0.95rem',

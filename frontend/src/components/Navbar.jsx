@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Sun, Moon, LogOut, User, DollarSign } from 'lucide-react';
+import { Sun, Moon, LogOut, ShieldCheck, Sparkles } from 'lucide-react';
 
 export const Navbar = () => {
   const { user, logout } = useAuth();
@@ -29,9 +29,12 @@ export const Navbar = () => {
     <header style={styles.header}>
       <div style={styles.leftSection}>
         <div style={styles.logoBadge}>
-          <DollarSign size={20} color="#ffffff" />
+          <Sparkles size={20} color="#ffffff" />
         </div>
-        <span style={styles.brandTitle}>SmartExpense</span>
+        <div style={styles.brandContainer}>
+          <span style={styles.brandTitle}>SmartExpense</span>
+          <span style={styles.brandTag}>V1.0 PRO</span>
+        </div>
       </div>
 
       <div style={styles.rightSection}>
@@ -40,13 +43,18 @@ export const Navbar = () => {
           style={styles.iconBtn}
           title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
         >
-          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          {theme === 'dark' ? <Sun size={18} color="#f59e0b" /> : <Moon size={18} color="#6366f1" />}
         </button>
 
         <div style={styles.userInfo}>
-          <div style={styles.avatar}>{getInitials(user?.name)}</div>
+          <div style={styles.avatarRing}>
+            <div style={styles.avatar}>{getInitials(user?.name)}</div>
+          </div>
           <div style={styles.userDetails}>
-            <span style={styles.userName}>{user?.name || 'User'}</span>
+            <div style={styles.userRow}>
+              <span style={styles.userName}>{user?.name || 'User'}</span>
+              <ShieldCheck size={14} color="var(--emerald)" />
+            </div>
             <span style={styles.userEmail}>{user?.email}</span>
           </div>
         </div>
@@ -65,49 +73,64 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '12px 24px',
-    backgroundColor: 'var(--bg-secondary)',
+    padding: '14px 28px',
+    backgroundColor: 'rgba(17, 24, 39, 0.85)',
     borderBottom: '1px solid var(--border-color)',
     position: 'sticky',
     top: 0,
     zIndex: 40,
-    backdropFilter: 'blur(10px)',
+    backdropFilter: 'blur(16px)',
   },
   leftSection: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
+    gap: '14px',
   },
   logoBadge: {
-    width: '36px',
-    height: '36px',
-    borderRadius: '10px',
-    background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+    width: '40px',
+    height: '40px',
+    borderRadius: '12px',
+    background: 'linear-gradient(135deg, #6366f1, #06b6d4)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     boxShadow: 'var(--shadow-glow)',
   },
+  brandContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
   brandTitle: {
     fontFamily: 'var(--font-display)',
-    fontSize: '1.25rem',
+    fontSize: '1.35rem',
     fontWeight: '800',
-    background: 'linear-gradient(135deg, #6366f1, #06b6d4)',
+    background: 'linear-gradient(135deg, #ffffff 30%, #94a3b8)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
+    letterSpacing: '-0.02em',
+  },
+  brandTag: {
+    fontSize: '0.65rem',
+    fontWeight: '800',
+    padding: '2px 6px',
+    borderRadius: '6px',
+    backgroundColor: 'var(--primary-light)',
+    color: 'var(--primary)',
+    border: '1px solid rgba(99, 102, 241, 0.3)',
   },
   rightSection: {
     display: 'flex',
     alignItems: 'center',
-    gap: '16px',
+    gap: '18px',
   },
   iconBtn: {
     background: 'var(--bg-tertiary)',
     color: 'var(--text-primary)',
     border: '1px solid var(--border-color)',
-    width: '38px',
-    height: '38px',
-    borderRadius: '10px',
+    width: '40px',
+    height: '40px',
+    borderRadius: '12px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -117,15 +140,20 @@ const styles = {
   userInfo: {
     display: 'flex',
     alignItems: 'center',
-    gap: '10px',
-    paddingLeft: '12px',
+    gap: '12px',
+    paddingLeft: '16px',
     borderLeft: '1px solid var(--border-color)',
+  },
+  avatarRing: {
+    padding: '2px',
+    borderRadius: '50%',
+    background: 'linear-gradient(135deg, #6366f1, #10b981)',
   },
   avatar: {
     width: '36px',
     height: '36px',
     borderRadius: '50%',
-    backgroundColor: 'var(--primary)',
+    backgroundColor: 'var(--bg-secondary)',
     color: '#ffffff',
     fontWeight: '700',
     fontSize: '0.85rem',
@@ -137,9 +165,14 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
   },
+  userRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+  },
   userName: {
     fontSize: '0.875rem',
-    fontWeight: '600',
+    fontWeight: '700',
     color: 'var(--text-primary)',
   },
   userEmail: {
@@ -150,8 +183,8 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '6px',
-    padding: '8px 14px',
-    borderRadius: '8px',
+    padding: '8px 16px',
+    borderRadius: '10px',
     backgroundColor: 'var(--danger-bg)',
     color: 'var(--danger)',
     border: '1px solid rgba(239, 68, 68, 0.3)',

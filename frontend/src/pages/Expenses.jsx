@@ -5,7 +5,7 @@ import { ExpenseForm } from '../components/ExpenseForm';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { Loading } from '../components/Loading';
 import { ErrorMessage } from '../components/ErrorMessage';
-import { Plus, Filter, RotateCcw, Search } from 'lucide-react';
+import { Plus, Filter, RotateCcw, Search, Receipt } from 'lucide-react';
 
 const CATEGORIES = [
   'FOOD', 'TRAVEL', 'SHOPPING', 'BILLS', 'ENTERTAINMENT',
@@ -24,7 +24,6 @@ export default function Expenses() {
   const [totalElements, setTotalElements] = useState(0);
   const [sort, setSort] = useState('expenseDate,desc');
 
-  // Filters State
   const [filters, setFilters] = useState({
     category: '',
     paymentMethod: '',
@@ -37,7 +36,6 @@ export default function Expenses() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Modal States
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [deletingExpense, setDeletingExpense] = useState(null);
@@ -65,7 +63,7 @@ export default function Expenses() {
       setTotalPages(response.totalPages || 0);
       setTotalElements(response.totalElements || 0);
     } catch (err) {
-      setError(err.message || 'Failed to load expenses list');
+      setError(err.message || 'Failed to load expenses');
     } finally {
       setLoading(false);
     }
@@ -78,6 +76,15 @@ export default function Expenses() {
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleQuickCategorySelect = (cat) => {
+    setFilters((prev) => ({
+      ...prev,
+      category: prev.category === cat ? '' : cat,
+    }));
+    setPage(0);
+    fetchExpenses();
   };
 
   const handleApplyFilters = (e) => {
@@ -152,44 +159,56 @@ export default function Expenses() {
     <div style={styles.container}>
       <div style={styles.pageHeader}>
         <div>
-          <h1 style={styles.pageTitle}>Expenses</h1>
-          <p style={styles.pageSubtitle}>Track, filter, and manage your daily transactions</p>
+          <div style={styles.headerBadge}>
+            <Receipt size={16} color="var(--primary)" />
+            <span>TRANSACTION MANAGEMENT</span>
+          </div>
+          <h1 style={styles.pageTitle}>Expenses Directory</h1>
+          <p style={styles.pageSubtitle}>Search, filter, and audit your daily financial records</p>
         </div>
         <button onClick={() => setIsAddOpen(true)} className="btn btn-primary">
           <Plus size={18} />
-          <span>Add Expense</span>
+          <span>New Expense</span>
         </button>
       </div>
 
       <ErrorMessage message={error} onRetry={fetchExpenses} />
 
-      {/* Filter Bar */}
-      <form onSubmit={handleApplyFilters} className="glass-card" style={styles.filterCard}>
-        <div style={styles.filterGrid}>
-          <div className="form-group" style={{ margin: 0 }}>
-            <label className="form-label">Category</label>
-            <select
-              name="category"
-              value={filters.category}
-              onChange={handleFilterChange}
-              className="form-control"
-            >
-              <option value="">All Categories</option>
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </div>
+      {/* Quick Category Filter Pills */}
+      <div style={styles.categoryPillsRow}>
+        <button
+          onClick={() => handleQuickCategorySelect('')}
+          style={{
+            ...styles.pillBtn,
+            ...(filters.category === '' ? styles.pillBtnActive : {}),
+          }}
+        >
+          All Categories
+        </button>
+        {CATEGORIES.map((c) => (
+          <button
+            key={c}
+            onClick={() => handleQuickCategorySelect(c)}
+            style={{
+              ...styles.pillBtn,
+              ...(filters.category === c ? styles.pillBtnActive : {}),
+            }}
+          >
+            {c}
+          </button>
+        ))}
+      </div>
 
+      {/* Advanced Filter Bar */}
+      <form onSubmit={handleApplyFilters} className="glass-panel" style={styles.filterCard}>
+        <div style={styles.filterGrid}>
           <div className="form-group" style={{ margin: 0 }}>
             <label className="form-label">Payment Method</label>
             <select
               name="paymentMethod"
               value={filters.paymentMethod}
               onChange={handleFilterChange}
-              className="form-control"
+              className="form-control-pro"
             >
               <option value="">All Payment Methods</option>
               {PAYMENT_METHODS.map((pm) => (
@@ -207,7 +226,7 @@ export default function Expenses() {
               name="startDate"
               value={filters.startDate}
               onChange={handleFilterChange}
-              className="form-control"
+              className="form-control-pro"
             />
           </div>
 
@@ -218,7 +237,7 @@ export default function Expenses() {
               name="endDate"
               value={filters.endDate}
               onChange={handleFilterChange}
-              className="form-control"
+              className="form-control-pro"
             />
           </div>
         </div>
@@ -235,10 +254,10 @@ export default function Expenses() {
         </div>
       </form>
 
-      {/* Expense Data Table Card */}
-      <div className="glass-card" style={styles.tableCard}>
+      {/* Expense Data Table Container */}
+      <div className="glass-panel" style={styles.tableCard}>
         {loading ? (
-          <Loading text="Fetching expenses..." />
+          <Loading text="Loading expenses list..." />
         ) : (
           <ExpenseTable
             expenses={expenses}
@@ -253,7 +272,7 @@ export default function Expenses() {
         )}
       </div>
 
-      {/* Add Expense Form Modal */}
+      {/* Modals */}
       <ExpenseForm
         isOpen={isAddOpen}
         onClose={() => setIsAddOpen(false)}
@@ -261,7 +280,6 @@ export default function Expenses() {
         loading={submitting}
       />
 
-      {/* Edit Expense Form Modal */}
       <ExpenseForm
         isOpen={!!editingExpense}
         initialData={editingExpense}
@@ -270,7 +288,6 @@ export default function Expenses() {
         loading={submitting}
       />
 
-      {/* Delete Confirmation Modal */}
       <ConfirmDialog
         isOpen={!!deletingExpense}
         title="Delete Expense Entry"
@@ -294,13 +311,48 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  headerBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    fontSize: '0.75rem',
+    fontWeight: '800',
+    color: 'var(--primary)',
+    letterSpacing: '0.08em',
+    marginBottom: '4px',
+  },
   pageTitle: {
-    fontSize: '1.75rem',
+    fontSize: '1.85rem',
     color: 'var(--text-primary)',
   },
   pageSubtitle: {
     fontSize: '0.9rem',
     color: 'var(--text-muted)',
+  },
+  categoryPillsRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    overflowX: 'auto',
+    paddingBottom: '4px',
+  },
+  pillBtn: {
+    padding: '8px 16px',
+    fontSize: '0.8rem',
+    fontWeight: '700',
+    borderRadius: '9999px',
+    backgroundColor: 'var(--bg-secondary)',
+    color: 'var(--text-secondary)',
+    border: '1px solid var(--border-color)',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    transition: 'var(--transition)',
+  },
+  pillBtnActive: {
+    backgroundColor: 'var(--primary-light)',
+    color: 'var(--primary)',
+    borderColor: 'rgba(99, 102, 241, 0.4)',
+    boxShadow: 'var(--shadow-glow)',
   },
   filterCard: {
     padding: '20px',
