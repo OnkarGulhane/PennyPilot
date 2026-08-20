@@ -5,6 +5,7 @@ import com.smartexpense.dto.dashboard.DashboardSummaryResponse;
 import com.smartexpense.dto.dashboard.MonthlySummaryResponse;
 import com.smartexpense.service.DashboardService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class DashboardController {
     @GetMapping("/summary")
     @Operation(summary = "Get overall dashboard summary metrics")
     public ResponseEntity<DashboardSummaryResponse> getDashboardSummary(
-            @AuthenticationPrincipal UserDetails userDetails
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails
     ) {
         DashboardSummaryResponse response = dashboardService.getDashboardSummary(userDetails.getUsername());
         return ResponseEntity.ok(response);
@@ -36,7 +37,7 @@ public class DashboardController {
     @GetMapping("/category-summary")
     @Operation(summary = "Get spending summary grouped by category")
     public ResponseEntity<List<CategorySummaryResponse>> getCategorySummary(
-            @AuthenticationPrincipal UserDetails userDetails
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails
     ) {
         List<CategorySummaryResponse> response = dashboardService.getCategorySummary(userDetails.getUsername());
         return ResponseEntity.ok(response);
@@ -45,7 +46,7 @@ public class DashboardController {
     @GetMapping("/monthly-summary")
     @Operation(summary = "Get monthly spending trend for the past 6 months")
     public ResponseEntity<List<MonthlySummaryResponse>> getMonthlySummary(
-            @AuthenticationPrincipal UserDetails userDetails
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails
     ) {
         List<MonthlySummaryResponse> response = dashboardService.getMonthlySummary(userDetails.getUsername());
         return ResponseEntity.ok(response);

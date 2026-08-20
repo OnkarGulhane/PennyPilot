@@ -6,6 +6,7 @@ import com.smartexpense.enums.ExpenseCategory;
 import com.smartexpense.enums.PaymentMethod;
 import com.smartexpense.service.ExpenseService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class ExpenseController {
     @PostMapping
     @Operation(summary = "Create a new expense")
     public ResponseEntity<ExpenseResponse> createExpense(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody ExpenseRequest request
     ) {
         ExpenseResponse response = expenseService.createExpense(userDetails.getUsername(), request);
@@ -41,7 +42,7 @@ public class ExpenseController {
     @GetMapping
     @Operation(summary = "Get paginated, sorted, and filtered expenses for authenticated user")
     public ResponseEntity<Page<ExpenseResponse>> getExpenses(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "expenseDate,desc") String sort,
@@ -61,7 +62,7 @@ public class ExpenseController {
     @GetMapping("/{id}")
     @Operation(summary = "Get expense by ID")
     public ResponseEntity<ExpenseResponse> getExpenseById(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long id
     ) {
         ExpenseResponse response = expenseService.getExpenseById(userDetails.getUsername(), id);
@@ -71,7 +72,7 @@ public class ExpenseController {
     @PutMapping("/{id}")
     @Operation(summary = "Update an existing expense")
     public ResponseEntity<ExpenseResponse> updateExpense(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long id,
             @Valid @RequestBody ExpenseRequest request
     ) {
@@ -82,7 +83,7 @@ public class ExpenseController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete expense by ID")
     public ResponseEntity<Void> deleteExpense(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long id
     ) {
         expenseService.deleteExpense(userDetails.getUsername(), id);
