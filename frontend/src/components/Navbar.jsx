@@ -1,16 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Sun, Moon, Sparkles, Activity, Search } from 'lucide-react';
+import { LogOut, Sun, Moon, Sparkles, Bell, CheckCircle2, ShieldCheck, Database } from 'lucide-react';
 
 export const Navbar = () => {
   const { user, logout } = useAuth();
-  const [theme, setTheme] = React.useState('dark');
+  const [theme, setTheme] = useState('dark');
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
 
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(nextTheme);
     document.documentElement.setAttribute('data-theme', nextTheme);
   };
+
+  const notifications = [
+    {
+      id: 1,
+      title: 'PostgreSQL Database Connected',
+      time: 'Just now',
+      desc: 'Flyway migration V1 active on PostgreSQL 17.11',
+      icon: Database,
+      color: 'var(--emerald)',
+    },
+    {
+      id: 2,
+      title: 'JWT Session Authenticated',
+      time: 'Active',
+      desc: 'Bearer token active for user workspace',
+      icon: ShieldCheck,
+      color: 'var(--primary)',
+    },
+  ];
 
   return (
     <header style={styles.header} className="navbar-responsive">
@@ -33,6 +53,49 @@ export const Navbar = () => {
       </div>
 
       <div style={styles.rightGroup}>
+        {/* Notification Bell Dropdown */}
+        <div style={{ position: 'relative' }}>
+          <button
+            onClick={() => setIsNotifOpen(!isNotifOpen)}
+            style={styles.iconBtn}
+            title="System Notifications"
+          >
+            <Bell size={18} color="var(--text-secondary)" />
+            <span style={styles.notifDot} />
+          </button>
+
+          {isNotifOpen && (
+            <div className="glass-panel animate-modal-pop" style={styles.notifDropdown}>
+              <div style={styles.notifHeader}>
+                <h4 style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: '800' }}>
+                  System Notifications
+                </h4>
+                <span style={styles.notifCount}>2 Active</span>
+              </div>
+              <div style={styles.notifList}>
+                {notifications.map((n) => {
+                  const NotifIcon = n.icon;
+                  return (
+                    <div key={n.id} style={styles.notifItem}>
+                      <div style={{ ...styles.notifIcon, backgroundColor: `${n.color}15` }}>
+                        <NotifIcon size={16} color={n.color} />
+                      </div>
+                      <div style={styles.notifContent}>
+                        <div style={styles.notifTitleRow}>
+                          <span style={styles.notifTitle}>{n.title}</span>
+                          <span style={styles.notifTime}>{n.time}</span>
+                        </div>
+                        <span style={styles.notifDesc}>{n.desc}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Theme Switcher */}
         <button onClick={toggleTheme} style={styles.iconBtn} title="Toggle Dark/Light Mode">
           {theme === 'dark' ? <Sun size={18} color="#f59e0b" /> : <Moon size={18} color="#6366f1" />}
         </button>
@@ -141,7 +204,7 @@ const styles = {
   rightGroup: {
     display: 'flex',
     alignItems: 'center',
-    gap: '16px',
+    gap: '14px',
   },
   iconBtn: {
     width: '38px',
@@ -153,7 +216,90 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
+    position: 'relative',
     transition: 'var(--transition)',
+  },
+  notifDot: {
+    position: 'absolute',
+    top: '8px',
+    right: '8px',
+    width: '7px',
+    height: '7px',
+    borderRadius: '50%',
+    backgroundColor: 'var(--primary)',
+    boxShadow: '0 0 6px var(--primary)',
+  },
+  notifDropdown: {
+    position: 'absolute',
+    top: '48px',
+    right: 0,
+    width: '320px',
+    padding: '16px',
+    borderRadius: '16px',
+    backgroundColor: 'var(--bg-secondary)',
+    border: '1px solid var(--border-color)',
+    boxShadow: 'var(--shadow-lg)',
+    zIndex: 100,
+  },
+  notifHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: '12px',
+    paddingBottom: '10px',
+    borderBottom: '1px solid var(--border-color)',
+  },
+  notifCount: {
+    fontSize: '0.7rem',
+    fontWeight: '800',
+    padding: '2px 8px',
+    borderRadius: '9999px',
+    backgroundColor: 'var(--primary-light)',
+    color: 'var(--primary)',
+  },
+  notifList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+  },
+  notifItem: {
+    display: 'flex',
+    gap: '10px',
+    padding: '8px',
+    borderRadius: '10px',
+    backgroundColor: 'rgba(15, 23, 42, 0.5)',
+  },
+  notifIcon: {
+    width: '32px',
+    height: '32px',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  notifContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2px',
+  },
+  notifTitleRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    gap: '6px',
+  },
+  notifTitle: {
+    fontSize: '0.8rem',
+    fontWeight: '700',
+    color: 'var(--text-primary)',
+  },
+  notifTime: {
+    fontSize: '0.65rem',
+    color: 'var(--text-muted)',
+  },
+  notifDesc: {
+    fontSize: '0.725rem',
+    color: 'var(--text-secondary)',
   },
   userSection: {
     display: 'flex',
