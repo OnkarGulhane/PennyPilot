@@ -1,28 +1,28 @@
 import React from 'react';
 import { formatCurrency } from '../utils/currency';
-import { AlertTriangle, CheckCircle2, Flame, Target, Plus, CalendarDays } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Flame, Target, Plus, CalendarDays, Edit3 } from 'lucide-react';
 
-export const BudgetCard = ({ budget, onSetBudget }) => {
+export const BudgetCard = ({ budget, onSetBudget, onEditBudget }) => {
   if (!budget || !budget.amount || Number(budget.amount) <= 0) {
     return (
       <div className="glass-panel" style={styles.emptyCard}>
         <div style={styles.emptyHeader}>
           <div style={styles.emptyIconBadge}>
-            <Target size={24} color="var(--primary)" />
+            <Target size={26} color="var(--primary)" />
           </div>
           <div>
             <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)', fontWeight: '800' }}>
-              No Monthly Budget Configured
+              No Monthly Budget Target Set
             </h3>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-              Set a monthly spending limit to monitor remaining balance and budget alerts.
+              Define a monthly spending limit to monitor remaining balance and safe daily allowances.
             </p>
           </div>
         </div>
         {onSetBudget && (
-          <button onClick={onSetBudget} className="btn btn-primary btn-sm" style={{ marginTop: '14px' }}>
+          <button onClick={onSetBudget} className="btn btn-primary btn-sm" style={{ marginTop: '16px' }}>
             <Plus size={16} />
-            <span>Set Current Month Budget</span>
+            <span>Set Current Month Target Budget</span>
           </button>
         )}
       </div>
@@ -61,10 +61,23 @@ export const BudgetCard = ({ budget, onSetBudget }) => {
           <span style={styles.subtitle}>MONTHLY TARGET BUDGET</span>
           <h3 style={styles.amount} className="tabular-nums">{formatCurrency(amount)}</h3>
         </div>
-        <span style={{ ...styles.badge, ...badgeStyle }}>
-          <StatusIcon size={14} />
-          <span>{statusText}</span>
-        </span>
+        
+        <div style={styles.headerActions}>
+          <span style={{ ...styles.badge, ...badgeStyle }}>
+            <StatusIcon size={14} />
+            <span>{statusText}</span>
+          </span>
+          
+          {(onEditBudget || onSetBudget) && (
+            <button
+              onClick={onEditBudget || onSetBudget}
+              style={styles.editBtn}
+              title="Edit Target Budget"
+            >
+              <Edit3 size={15} color="var(--primary)" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Progress Bar & Labels */}
@@ -85,7 +98,7 @@ export const BudgetCard = ({ budget, onSetBudget }) => {
       <div style={styles.footerRow}>
         <div style={styles.footerItem}>
           <CalendarDays size={14} color="var(--secondary)" />
-          <span>Safe Daily Spending Allowance: <strong className="tabular-nums" style={{ color: 'var(--text-primary)' }}>{formatCurrency(safeDailyAllowance)} / day</strong> ({daysRemaining} days left)</span>
+          <span>Safe Daily Allowance: <strong className="tabular-nums" style={{ color: 'var(--text-primary)' }}>{formatCurrency(safeDailyAllowance)} / day</strong> ({daysRemaining} days left)</span>
         </div>
       </div>
     </div>
@@ -103,6 +116,11 @@ const styles = {
     display: 'flex',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
+  },
+  headerActions: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
   },
   subtitle: {
     fontSize: '0.75rem',
@@ -125,6 +143,17 @@ const styles = {
     borderRadius: '9999px',
     fontSize: '0.8rem',
     fontWeight: '700',
+  },
+  editBtn: {
+    background: 'var(--bg-tertiary)',
+    border: '1px solid var(--border-color)',
+    cursor: 'pointer',
+    padding: '8px',
+    borderRadius: '10px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'var(--transition)',
   },
   progressSection: {
     display: 'flex',

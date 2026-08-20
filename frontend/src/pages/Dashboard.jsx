@@ -106,6 +106,11 @@ export default function Dashboard() {
     }
   };
 
+  const handleOpenBudgetModal = () => {
+    setBudgetInput(currentBudget?.amount !== undefined ? String(currentBudget.amount) : '');
+    setIsSetBudgetOpen(true);
+  };
+
   const handleSaveBudget = async (e) => {
     e.preventDefault();
     const amountNum = parseFloat(budgetInput);
@@ -116,11 +121,20 @@ export default function Dashboard() {
 
     setSubmitting(true);
     try {
-      await budgetApi.createBudget({
+      const payload = {
         month: now.getMonth() + 1,
         year: now.getFullYear(),
         amount: amountNum,
-      });
+      };
+
+      if (currentBudget && currentBudget.id) {
+        // Update existing budget
+        await budgetApi.updateBudget(currentBudget.id, payload);
+      } else {
+        // Create new budget
+        await budgetApi.createBudget(payload);
+      }
+
       setIsSetBudgetOpen(false);
       setBudgetInput('');
       fetchDashboardData();
@@ -198,7 +212,8 @@ export default function Dashboard() {
       <div style={styles.chartsGrid} className="grid-responsive-2col">
         <BudgetCard
           budget={currentBudget}
-          onSetBudget={() => setIsSetBudgetOpen(true)}
+          onSetBudget={handleOpenBudgetModal}
+          onEditBudget={handleOpenBudgetModal}
         />
 
         {/* Category Pie Chart */}
@@ -297,7 +312,7 @@ export default function Dashboard() {
         loading={submitting}
       />
 
-      {/* Quick Set Budget Modal */}
+      {/* Quick Set / Edit Budget Modal */}
       {isSetBudgetOpen && (
         <div style={styles.overlay}>
           <div className="glass-panel" style={styles.budgetModal}>
@@ -305,7 +320,9 @@ export default function Dashboard() {
               <div style={styles.modalIcon}>
                 <Wallet size={24} color="var(--primary)" />
               </div>
-              <h3 style={{ fontSize: '1.25rem', color: 'var(--text-primary)' }}>Set Current Month Budget</h3>
+              <h3 style={{ fontSize: '1.25rem', color: 'var(--text-primary)', fontWeight: '800' }}>
+                {currentBudget && currentBudget.id ? 'Edit Current Month Budget Target' : 'Set Current Month Budget Target'}
+              </h3>
             </div>
 
             <form onSubmit={handleSaveBudget}>
@@ -329,7 +346,7 @@ export default function Dashboard() {
                   Cancel
                 </button>
                 <button type="submit" disabled={submitting} className="btn btn-primary">
-                  {submitting ? 'Saving...' : 'Save Target Budget'}
+                  {submitting ? 'Saving...' : currentBudget && currentBudget.id ? 'Update Budget Target' : 'Save Budget Target'}
                 </button>
               </div>
             </form>
