@@ -218,6 +218,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   border-radius: 9999px;
   letter-spacing: 0.03em;
+  white-space: nowrap;
 }
 
 .dot-badge::before {
@@ -239,6 +240,25 @@ h1, h2, h3, h4, h5, h6 {
 .badge-groceries { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
 .badge-other { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
 
+/* Progress Bar */
+.progress-container {
+  width: 100%;
+  height: 10px;
+  background-color: var(--bg-tertiary);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.5s ease-in-out;
+}
+
+.progress-success { background: linear-gradient(90deg, #10b981, #34d399); }
+.progress-warning { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.progress-danger { background: linear-gradient(90deg, #ef4444, #f87171); }
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
@@ -253,4 +273,83 @@ h1, h2, h3, h4, h5, h6 {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
+}
+
+/* ==========================================================================
+   Responsive Breakpoints & Layout Rules
+   ========================================================================== */
+
+/* Tablets and Mobile Devices (Width <= 900px) */
+@media (max-width: 900px) {
+  .app-layout {
+    flex-direction: column !important;
+  }
+
+  .sidebar-container {
+    width: 100% !important;
+    min-height: auto !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    padding: 12px 16px !important;
+  }
+
+  .sidebar-nav {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    padding-bottom: 4px !important;
+  }
+
+  .sidebar-link {
+    white-space: nowrap !important;
+  }
+
+  .main-content {
+    padding: 20px 16px !important;
+  }
+
+  .hero-banner-responsive {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+    padding: 24px !important;
+  }
+
+  .grid-responsive-2col {
+    grid-template-columns: 1fr !important;
+  }
+
+  .grid-responsive-4col {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  }
+}
+
+/* Small Mobile Devices (Width <= 600px) */
+@media (max-width: 600px) {
+  .navbar-responsive {
+    padding: 10px 14px !important;
+  }
+
+  .navbar-user-details {
+    display: none !important;
+  }
+
+  .page-header-responsive {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .grid-responsive-4col {
+    grid-template-columns: 1fr !important;
+  }
+
+  .modal-responsive {
+    padding: 20px !important;
+    margin: 10px !important;
+  }
+
+  .form-row-responsive {
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
 }

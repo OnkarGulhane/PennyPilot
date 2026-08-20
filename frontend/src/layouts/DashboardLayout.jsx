@@ -7,9 +7,9 @@ export const DashboardLayout = () => {
   return (
     <div style={styles.container}>
       <Navbar />
-      <div style={styles.mainLayout}>
+      <div style={styles.mainLayout} className="app-layout">
         <Sidebar />
-        <main style={styles.content}>
+        <main style={styles.content} className="main-content">
           <Outlet />
         </main>
       </div>

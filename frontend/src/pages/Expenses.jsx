@@ -157,7 +157,7 @@ export default function Expenses() {
 
   return (
     <div style={styles.container}>
-      <div style={styles.pageHeader}>
+      <div style={styles.pageHeader} className="page-header-responsive">
         <div>
           <div style={styles.headerBadge}>
             <Receipt size={16} color="var(--primary)" />

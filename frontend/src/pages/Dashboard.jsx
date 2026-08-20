@@ -89,7 +89,7 @@ export default function Dashboard() {
   return (
     <div style={styles.container}>
       {/* Hero Financial Health Header Banner */}
-      <div className="glass-panel" style={styles.heroBanner}>
+      <div className="glass-panel hero-banner-responsive" style={styles.heroBanner}>
         <div style={styles.heroLeft}>
           <div style={styles.heroBadge}>
             <Activity size={16} color="var(--emerald)" />
@@ -112,7 +112,7 @@ export default function Dashboard() {
       <ErrorMessage message={error} onRetry={fetchDashboardData} />
 
       {/* Metric Cards Row */}
-      <div style={styles.metricsGrid}>
+      <div style={styles.metricsGrid} className="grid-responsive-4col">
         <SummaryCard
           title="Total Lifetime Spent"
           amount={summary?.totalExpense || 0}
@@ -148,7 +148,7 @@ export default function Dashboard() {
       </div>
 
       {/* Budget & Category Breakdown Grid */}
-      <div style={styles.chartsGrid}>
+      <div style={styles.chartsGrid} className="grid-responsive-2col">
         <BudgetCard budget={currentBudget} />
 
         {/* Category Pie Chart */}

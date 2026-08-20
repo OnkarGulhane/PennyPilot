@@ -105,7 +105,7 @@ export default function Budget() {
 
   return (
     <div style={styles.container}>
-      <div style={styles.pageHeader}>
+      <div style={styles.pageHeader} className="page-header-responsive">
         <div>
           <div style={styles.headerBadge}>
             <Wallet size={16} color="var(--emerald)" />
@@ -123,7 +123,7 @@ export default function Budget() {
       <ErrorMessage message={error} onRetry={fetchBudgets} />
 
       {/* Budgets Grid */}
-      <div style={styles.budgetGrid}>
+      <div style={styles.budgetGrid} className="grid-responsive-2col">
         {budgets.map((b) => (
           <div key={b.id} style={styles.cardWrapper}>
             <BudgetCard budget={b} />

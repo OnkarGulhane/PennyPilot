@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Wallet, PieChart, Layers } from 'lucide-react';
+import { LayoutDashboard, Receipt, Wallet, Layers } from 'lucide-react';
 
 export const Sidebar = () => {
   const mainNav = [
@@ -10,15 +10,16 @@ export const Sidebar = () => {
   ];
 
   return (
-    <aside style={styles.sidebar}>
+    <aside style={styles.sidebar} className="sidebar-container">
       <div style={styles.sectionHeader}>MAIN NAVIGATION</div>
-      <nav style={styles.nav}>
+      <nav style={styles.nav} className="sidebar-nav">
         {mainNav.map((item) => {
           const Icon = item.icon;
           return (
             <NavLink
               key={item.path}
               to={item.path}
+              className="sidebar-link"
               style={({ isActive }) => ({
                 ...styles.link,
                 ...(isActive ? styles.activeLink : {}),
